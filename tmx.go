@@ -61,7 +61,7 @@ func (d *Data) decode(n int) error {
 		if err != nil {
 			return err
 		}
-		var r io.Reader
+		var r io.ReadCloser
 		switch d.Compression {
 		case "":
 		case "gzip":
@@ -76,7 +76,9 @@ func (d *Data) decode(n int) error {
 			return errors.New("unsupported compression: " + d.Compression)
 		}
 		if r != nil {
-			if b, err = io.ReadAll(r); err != nil {
+			b, err = io.ReadAll(r)
+			r.Close()
+			if err != nil {
 				return err
 			}
 		}
